@@ -2,12 +2,10 @@
 
 import boto3
 
-from aws_train.budget import build_budget_request
+from aws_train.budget import BUDGETS_REGION, build_budget_request
 from aws_train.config import Settings
 from aws_train.naming import BUDGET_NAME
 from aws_train.runner import account_id, run
-
-BUDGETS_REGION = "us-east-1"
 
 
 def main(settings: Settings, session: boto3.Session) -> None:

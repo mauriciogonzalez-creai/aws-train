@@ -6,6 +6,7 @@ from aws_train.config import Settings
 from aws_train.naming import BUDGET_NAME
 from aws_train.tags import with_project_tag
 
+BUDGETS_REGION = "us-east-1"
 ACTUAL_ALERT_PERCENT = 80
 FORECASTED_ALERT_PERCENT = 100
 
