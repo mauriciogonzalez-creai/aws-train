@@ -11,7 +11,7 @@ The repo is a training guide plus a runnable demo for Learners who know Python a
 
 ## Decision
 
-We will write the demo as numbered Python 3.12 scripts (Steps) managed with uv (venv + lockfile), calling AWS through the SageMaker Python SDK and boto3, training with SageMaker's Built-in XGBoost on a public non-PII dataset, and testing local logic with pytest.
+We will write the demo as numbered Python 3.12 scripts (Steps) managed with uv (venv + lockfile), calling AWS through the SageMaker Python SDK v3 (`sagemaker.train.ModelTrainer` for training, `sagemaker.core.resources` for Model, Endpoint Configuration and Endpoint) and boto3, training with SageMaker's Built-in XGBoost on a public non-PII dataset, and testing local logic with pytest.
 
 ## Consequences
 
@@ -25,7 +25,8 @@ We will write the demo as numbered Python 3.12 scripts (Steps) managed with uv (
 
 - Training runs remotely as a Training Job: every run costs money (cents on the allowlisted instance) and needs network access.
 - Built-in XGBoost dictates the data format (CSV, label first, no header); the guide must teach it.
-- The SageMaker SDK has had breaking major versions; the pinned major must be stated in the guide. Whether to pin v2 (what most tutorials, including those linked in GRZR-11, use) or v3 is OPEN — I haven't verified v3's API differences; resolve before the first Step is written.
+- The SageMaker SDK has had breaking major versions. We pin SageMaker Python SDK v3 (`sagemaker>=3,<4`). v2 was chosen first but switched the same day (2026-10-15): v2.257 warns on import that it is on the path of deprecation and v3 is the actively developed major. Most tutorials, including those linked in GRZR-11, still show v2 (`Estimator`, `.deploy()`); the guide states the pin so Learners don't copy v2 examples.
+- `sagemaker.serve` (v3.25) creates a boto3 client from the default session at import time and fails without a region; the Steps do not import it and use `sagemaker.core.resources` for hosting instead.
 
 ### Neutral
 

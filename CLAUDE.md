@@ -5,7 +5,7 @@
 
 ## Stack
 
-Python 3.12 + uv + SageMaker Python SDK / boto3 + Built-in XGBoost on Amazon SageMaker AI (Serverless Endpoint primary), AWS `us-east-1`, IAM Identity Center SSO. pytest for local logic. Learner-facing guide in Spanish; everything else in English.
+Python 3.12 + uv + SageMaker Python SDK / boto3 + Built-in XGBoost on Amazon SageMaker AI (Serverless Endpoint only), AWS `us-east-1`, `aws login` with an IAM user (needs `boto3[crt]`). pytest for local logic. Learner-facing guide in Spanish; everything else in English.
 
 ## Branch model
 
@@ -56,7 +56,7 @@ final, nothing is created without approval. Repo-specific steps go in this file 
 - `uv sync` — install deps from the lockfile
 - `uv run pytest` — run local-logic tests
 - `uv run ruff check . && uv run black --check . && uv run mypy .` — lint
-- `aws sso login --profile <profile>` — refresh credentials before running Steps
+- `aws login --profile <profile>` — refresh credentials before running Steps
 - `uv run python steps/<NN>_<name>.py` — run one Step (in order; the last one is the Teardown)
 (Commands are the intended layout; none exist until the first change lands.)
 
@@ -64,8 +64,8 @@ final, nothing is created without approval. Repo-specific steps go in this file 
 
 See `docs/adr/` for all recorded decisions. Highlights:
 - ADR-001-tech-stack — Python 3.12 + uv + SageMaker SDK + Built-in XGBoost
-- ADR-002-auth-strategy — IAM Identity Center SSO + dedicated Execution Role
-- ADR-003-deployment-target — Serverless Endpoint in us-east-1, Real-time as comparison, cost guardrails
+- ADR-002-auth-strategy — `aws login` with an IAM user + dedicated Execution Role
+- ADR-003-deployment-target — Serverless Endpoint only in us-east-1, cost guardrails
 - ADR-004-independent-from-origo — no Origo dependencies; own ADR sequence
 - ADR-005-trunk-based-branching — `main` only
 

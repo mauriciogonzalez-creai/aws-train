@@ -14,10 +14,10 @@
 - **SageMaker Model** — the resource that binds a Model Artifact, an Image URI and the Execution Role. Not the same as the trained model file.
 - **Endpoint Configuration** — the resource that says HOW a SageMaker Model is served (instance type and count, or serverless memory and concurrency).
 - **Endpoint** — the live HTTPS inference resource created from an Endpoint Configuration.
-- **Serverless Endpoint** — an Endpoint that scales to zero and bills per request; the guide's primary path.
-- **Real-time Endpoint** — an Endpoint on a dedicated instance that bills per hour while it exists; taught as a comparison only.
+- **Serverless Endpoint** — an Endpoint that scales to zero and bills per request; the only endpoint type the demo creates.
+- **Real-time Endpoint** — an Endpoint on a dedicated instance that bills per hour while it exists; explained in the guide, never created by the demo (ADR-003).
 - **Cold start** — the extra latency on the first call to a Serverless Endpoint after it scaled to zero.
-- **Execution Role** — the IAM role SageMaker assumes to read and write S3 and pull the Image URI. Distinct from the Learner's own SSO credentials.
+- **Execution Role** — the IAM role SageMaker assumes to read and write S3 and pull the Image URI. Distinct from the Learner's own `aws login` credentials.
 - **Budget Guardrail** — the AWS Budget with email alert created by Step 0 before any billable resource.
 - **Project Tag** — the tag `project=aws-train` carried by every resource the demo creates; the Teardown finds resources by it.
 - **Teardown** — the final Step that deletes every tagged resource (Endpoint, Endpoint Configuration, SageMaker Model, S3 bucket).
@@ -27,19 +27,19 @@
 - Step 0 creates the Budget Guardrail; no Step may create a billable resource before it exists (ref: GRZR-11 kickoff, 2026-10-15).
 - Every resource the demo creates carries the Project Tag; a resource created without it is a bug, because the Teardown cannot find it.
 - The guide always ends with the Teardown Step; any new Step that creates a resource must extend the Teardown in the same change.
-- Instance types come from a single allowlist constant; Steps reject any other type. The allowlist holds the smallest free-tier-eligible types (ml.m5.xlarge for training and real-time per AWS's published free tier — I haven't verified the current free-tier list; re-check before the first release).
-- The Serverless Endpoint is the primary path; the Real-time Endpoint section must warn about per-hour billing and send the Learner to the Teardown immediately after the comparison.
+- Instance types come from a single allowlist constant; Steps reject any other type. The allowlist holds the smallest free-tier-eligible training type (ml.m5.xlarge per AWS's published free tier — I haven't verified the current free-tier list; re-check before the first release).
+- The demo creates no Real-time Endpoint; adding one requires superseding ADR-003.
 - Only public, non-PII datasets are used. Real or client data is out of scope for this repo.
 - Default region is `us-east-1`; the region is configurable but the guide is only verified there.
 - AWS App Runner is not used: it closed to new customers on 2026-04-30, so a Learner's new account cannot follow that path.
 
 ## External Integrations
 
-- **AWS IAM Identity Center** — auth: SSO via `aws configure sso` (temporary credentials). Used for: the Learner's access to their own account (ADR-002).
-- **AWS IAM** — auth: Learner's SSO session. Used for: creating the Execution Role.
-- **Amazon S3** — auth: SSO session (scripts) / Execution Role (SageMaker). Used for: training data and the Model Artifact.
-- **Amazon SageMaker AI** — auth: SSO session + Execution Role. Used for: Training Job, SageMaker Model, Endpoint Configuration, Endpoints, inference calls.
-- **AWS Budgets** — auth: SSO session. Used for: the Budget Guardrail in Step 0.
+- **AWS Sign-In (`aws login`)** — auth: browser sign-in as an IAM user with `SignInLocalDevelopmentAccess` (temporary credentials, CLI ≥ 2.32.0, boto3 needs the `crt` extra). Used for: the Learner's access to their own account (ADR-002).
+- **AWS IAM** — auth: Learner's `aws login` session. Used for: creating the Execution Role.
+- **Amazon S3** — auth: `aws login` session (scripts) / Execution Role (SageMaker). Used for: training data and the Model Artifact.
+- **Amazon SageMaker AI** — auth: `aws login` session + Execution Role. Used for: Training Job, SageMaker Model, Endpoint Configuration, Endpoints, inference calls.
+- **AWS Budgets** — auth: `aws login` session. Used for: the Budget Guardrail in Step 0.
 
 ## Key Concepts
 
@@ -61,5 +61,5 @@
 |------|-------|--------------|
 | S | ≤ 3 h | One Step or one guide section adjustment |
 | M | 4–8 h | A new Step with its tests and guide section |
-| L | 9–24 h | A multi-Step path (e.g. the Real-time comparison end to end) |
+| L | 9–24 h | A multi-Step path end to end (e.g. the whole demo) |
 | XL | > 24 h | Over the vara — split the subtask |
