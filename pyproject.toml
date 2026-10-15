@@ -1,0 +1,52 @@
+[project]
+name = "aws-train"
+version = "0.1.0"
+description = "Training demo: train a Built-in XGBoost model and serve it from a SageMaker Serverless Endpoint."
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "sagemaker>=3,<4",
+    "boto3[crt]",
+    "scikit-learn",
+    "pandas",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "ruff",
+    "black",
+    "isort",
+    "mypy",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/aws_train"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov=aws_train --cov-report=term-missing"
+
+[tool.black]
+line-length = 100
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true
+mypy_path = "src"
